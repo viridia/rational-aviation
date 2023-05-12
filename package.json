@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "format": "prettier --write src",
+    "prettier": "prettier --check src",
     "preview": "vite preview",
     "test.e2e": "cypress run",
     "test.unit": "vitest",
@@ -19,11 +21,14 @@
     "@capacitor/status-bar": "5.0.2",
     "@ionic/react": "^7.0.0",
     "@ionic/react-router": "^7.0.0",
+    "@reduxjs/toolkit": "^1.9.5",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
+    "@vanilla-extract/css": "^1.11.0",
     "ionicons": "^7.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-redux": "^8.0.5",
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4"
   },
@@ -34,15 +39,22 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
+    "@vanilla-extract/vite-plugin": "^3.8.0",
     "@vitejs/plugin-legacy": "^4.0.2",
     "@vitejs/plugin-react": "^3.1.0",
     "cypress": "^12.7.0",
     "eslint": "^8.35.0",
     "eslint-plugin-react": "^7.32.2",
     "jsdom": "^21.1.0",
+    "prettier": "^2.8.8",
     "typescript": "^4.9.3",
     "vite": "^4.1.0",
     "vitest": "^0.29.2"
   },
-  "description": "An Ionic project"
+  "description": "An Ionic project",
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 100,
+    "arrowParens": "avoid"
+  }
 }
