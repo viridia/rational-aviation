@@ -3,6 +3,15 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom/extend-expect';
+import { vi } from 'vitest';
+import { useTranslation } from 'react-i18next';
+
+// Mock useTranslation to simply return the translation key.
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (s: string) => s,
+  }),
+}));
 
 // Mock matchmedia
 window.matchMedia =
@@ -14,3 +23,11 @@ window.matchMedia =
       removeListener: function () {},
     };
   };
+
+// @ts-ignore
+window.Ionic = {
+  config: {
+    _testing: true,
+    mode: 'md',
+  },
+};
