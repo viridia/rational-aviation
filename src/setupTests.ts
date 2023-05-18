@@ -4,6 +4,7 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom/extend-expect';
 import { vi } from 'vitest';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useTranslation } from 'react-i18next';
 
 // Mock useTranslation to simply return the translation key.
@@ -24,10 +25,10 @@ window.matchMedia =
     };
   };
 
+// Disable rendering of certain components which have issues running in jsdom
 // @ts-ignore
 window.Ionic = {
   config: {
     _testing: true,
-    mode: 'md',
   },
 };

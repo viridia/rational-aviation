@@ -1,35 +1,40 @@
-import { FC } from 'react';
-import { IGraph, IGraphNode, Point2D, moveNode } from '../../store';
-import { graphContainerCss } from './GraphView.css';
-import { useAppDispatch, useGraphSelector } from '../../store/hooks';
+import { FC, useEffect } from 'react';
+import { NodeID } from '../../store';
+import { useAppSelector } from '../../store/hooks';
+import { animated, useSpring } from '@react-spring/web';
+import { graphNodeCss } from './GraphNode.css';
+import clsx from 'clsx';
 
 interface Props {
   nodeId: number;
+  onStartDrag: (e: React.PointerEvent, nodeId: NodeID) => void;
 }
 
-export const GraphNode: FC<Props> = ({ nodeId }) => {
-  const node = useGraphSelector(state => state.graph.nodes[nodeId]);
-  const dispatch = useAppDispatch();
+export const GraphNode: FC<Props> = ({ nodeId, onStartDrag }) => {
+  const node = useAppSelector(state => state.graph.nodes[nodeId]);
+  const isAnchor = useAppSelector(state => state.gesture.anchorNode === nodeId);
 
   const [x, y] = node.position;
+  const [props, api] = useSpring(() => ({
+    from: { x, y },
+  }));
+
+  useEffect(() => {
+    api.start({
+      to: { x, y },
+    });
+  }, [x, y]);
 
   return (
-    <rect
-      className={graphContainerCss}
-      x={x}
-      y={y}
+    <animated.rect
+      className={clsx(graphNodeCss, { isAnchor })}
+      x={props.x}
+      y={props.y}
       width={node.width}
       height={node.height}
-      strokeWidth={2}
-      stroke="red"
       onPointerDown={e => {
-        e.currentTarget.setPointerCapture(e.pointerId);
+        onStartDrag(e, nodeId);
       }}
-      onPointerMove={e => {
-        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-          dispatch(moveNode({ nodeId, position: [x + e.movementX, y + e.movementY] }));
-        }
-      }}
-    ></rect>
+    ></animated.rect>
   );
 };

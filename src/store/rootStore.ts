@@ -1,10 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { addNode, connect, graphSlice } from './Graph';
+import { gestureListener, gestureSlice } from './Gesture';
 
 export const rootStore = configureStore({
   reducer: {
     graph: graphSlice.reducer,
+    gesture: gestureSlice.reducer,
   },
+
+  middleware: getDefaultMiddlware => getDefaultMiddlware().prepend(gestureListener.middleware),
 });
 
 export type RootState = ReturnType<typeof rootStore.getState>;
@@ -36,6 +40,6 @@ rootStore.dispatch(
 rootStore.dispatch(
   connect({
     startNode: node1,
-    endNode: node2
+    endNode: node2,
   })
 );

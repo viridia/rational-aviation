@@ -8,6 +8,7 @@ export const graphContainerCss = style({
   top: 0,
   bottom: 0,
   backgroundColor: 'var(--background)',
+  overflow: 'auto',
 
   // CSS checkerboard pattern
   backgroundImage: [
@@ -34,6 +35,10 @@ export const graphContainerCss = style({
   vars: {
     '--colorGraphBgSquares': 'rgba(255, 255, 255, 0.03)',
   },
+});
+
+export const graphContainerScrollCss = style({
+
 });
 
 export const graphContentCss = style({

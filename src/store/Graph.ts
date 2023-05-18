@@ -1,22 +1,23 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 export type Point2D = [number, number];
+export type NodeID = number;
 
 /** A node graph. */
 export interface IGraph {
   /** Map of ids to nodes. */
-  nodes: Record<number, IGraphNode>;
+  nodes: Record<NodeID, IGraphNode>;
 
   /** List of connections. */
   connections: IConnection[];
 
   /** Next node id for adding nodes. */
-  nextNodeId: number;
+  nextNodeId: NodeID;
 }
 
 /** Defines an individual node in the graph. */
 export interface IGraphNode<Payload = unknown> {
-  id: number;
+  id: NodeID;
   position: Point2D;
   width: number;
   height: number;
@@ -26,8 +27,8 @@ export interface IGraphNode<Payload = unknown> {
 
 /** A connection between two nodes. */
 export interface IConnection {
-  startNode: number;
-  endNode: number;
+  startNode: NodeID;
+  endNode: NodeID;
   route: Point2D[];
 }
 
