@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "format": "prettier --write src",
     "prettier": "prettier --check src",
-    "postinstall": "ln -sfh en public/locales/en-US",
+    "postinstall": "ln -sfn en public/locales/en-US",
     "preview": "vite preview",
     "test.e2e": "cypress run",
     "test.unit": "vitest",
