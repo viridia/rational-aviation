@@ -16,7 +16,7 @@ export const GestureFeedback: FC = memo(() => {
     if (l <= 0.0001) {
       return '';
     }
-    const backOff = Math.min(l, 8);
+    const backOff = Math.min(l, 20);
     const ix = px - (px - ax) * backOff / l;
     const iy = py - (py - ay) * backOff / l;
 
@@ -43,14 +43,14 @@ export const GestureFeedback: FC = memo(() => {
         <marker
           id="feedback-end"
           viewBox="0 0 20 20"
-          refX="10"
+          refX="20"
           refY="5"
-          markerWidth="12"
-          markerHeight="12"
+          markerWidth="10"
+          markerHeight="10"
           orient="auto-start-reverse"
         >
           <path
-            d="M 10 2 L 2 5 L 10 8 L 18 5 z"
+            d="M 10 1 L 2 5 L 10 9 L 18 5 z"
             stroke="yellow"
             strokeWidth={2}
             strokeLinejoin="miter"
@@ -62,11 +62,11 @@ export const GestureFeedback: FC = memo(() => {
       <path
         className={gestureFeedbackCss}
         stroke="yellow"
-        strokeWidth={3}
-        strokeDasharray="8"
+        strokeWidth={2}
+        strokeDasharray="6,2"
         d={path}
         fill="transparent"
-        opacity={.3}
+        opacity={.5}
         markerEnd="url(#feedback-end)"
       ></path>
     </>

@@ -1,14 +1,14 @@
 import { FC, useRef } from 'react';
 import { graphContainerCss, graphContainerScrollCss, graphContentCss } from './GraphView.css';
-import { GraphNode } from './GraphNode';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { GraphEdge } from './GraphEdge';
 import { GestureFeedback } from './GestureFeedback';
 import { NodeID, beginDrag, cancelDrag, endDrag, updateDrag } from '../../store';
 import clsx from 'clsx';
 import { GraphEdgeMarkers } from './GraphEdgeMarkers';
+import { HGraphNode } from './HGraphNode';
 
-export const GraphView: FC = () => {
+export const HGraphView: FC = () => {
   const graph = useAppSelector(state => state.graph);
   const isDragging = useAppSelector(state => !!state.gesture.type);
   const dispatch = useAppDispatch();
@@ -56,6 +56,9 @@ export const GraphView: FC = () => {
         }
       }}
     >
+      {Object.values(graph.nodes).map(node => (
+        <HGraphNode key={node.id} nodeId={node.id} onStartDrag={onStartDragNode} />
+      ))}
       <div className={graphContainerScrollCss}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -67,9 +70,6 @@ export const GraphView: FC = () => {
           height={2100}
         >
           <GraphEdgeMarkers />
-          {Object.values(graph.nodes).map(node => (
-            <GraphNode key={node.id} nodeId={node.id} onStartDrag={onStartDragNode} />
-          ))}
           {graph.edges.map(edge => {
             return <GraphEdge key={`${edge.source}:${edge.target}`} edge={edge} />;
           })}

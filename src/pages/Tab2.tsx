@@ -1,20 +1,39 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/react';
+import { HGraphView } from '../components/graph/HGraphView';
+import { layoutRandom } from '../store';
+import { useTranslation } from 'react-i18next';
+import { useAppDispatch } from '../store/hooks';
 
 const Tab2: React.FC = () => {
+  const { t } = useTranslation('app');
+  const dispatch = useAppDispatch();
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Tab 2</IonTitle>
+          <IonTitle>{t('graphView')}</IonTitle>
+          <IonButtons slot="end">
+            <IonButton
+              onClick={() => {
+                dispatch(layoutRandom());
+              }}
+            >
+              Randomize
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Tab 2</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        {/* <ExploreContainer name="Tab 2 page" /> */}
+      <IonContent>
+        <HGraphView />
       </IonContent>
     </IonPage>
   );

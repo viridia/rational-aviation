@@ -27,7 +27,7 @@ for (let i = 0; i < 1000; i++) {
   nodes.push({
     title: `${i + 1}`,
     position: [0, 0],
-    size: [50, 50],
+    size: [80, 50],
     data: null,
   });
 }
@@ -38,7 +38,7 @@ rootStore.dispatch(
   addEdges([
     {
       source: '1',
-      target: '2',
+      target: '190',
     },
     {
       source: '3',

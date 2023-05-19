@@ -49,4 +49,5 @@ export const graphContainerScrollCss = style({});
 export const graphContentCss = style({
   left: 0,
   top: 0,
+  pointerEvents: 'none',
 });
