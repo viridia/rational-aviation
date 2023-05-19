@@ -9,5 +9,8 @@ export const graphNodeCss = style({
     '&.isAnchor': {
       fill: 'blue',
     },
+    '&.isTarget': {
+      fill: 'purple',
+    },
   },
 });

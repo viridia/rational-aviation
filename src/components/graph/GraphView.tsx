@@ -3,16 +3,18 @@ import { graphContainerCss, graphContainerScrollCss, graphContentCss } from './G
 import { GraphNode } from './GraphNode';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { GraphConnection } from './GraphConnection';
-import { GestureView } from './GestureView';
+import { GestureFeedback } from './GestureFeedback';
 import { NodeID, beginDrag, cancelDrag, endDrag, updateDrag } from '../../store';
+import clsx from 'clsx';
 
 export const GraphView: FC = () => {
   const graph = useAppSelector(state => state.graph);
+  const isDragging = useAppSelector(state => !!state.gesture.type);
   const dispatch = useAppDispatch();
   const ref = useRef<HTMLDivElement>(null);
 
   const onStartDragNode = (e: React.PointerEvent, nodeId: NodeID) => {
-      if (ref.current) {
+    if (ref.current) {
       ref.current.setPointerCapture(e.pointerId);
       const rect = ref.current!.getBoundingClientRect();
       dispatch(
@@ -29,11 +31,17 @@ export const GraphView: FC = () => {
   return (
     <div
       ref={ref}
-      className={graphContainerCss}
+      className={clsx(graphContainerCss, { isDragging })}
       onPointerMove={e => {
         if (ref.current?.hasPointerCapture(e.pointerId)) {
           const rect = ref.current!.getBoundingClientRect();
-          dispatch(updateDrag({ pos: [e.clientX - rect.left, e.clientY - rect.top] }));
+          const elt = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement;
+          dispatch(
+            updateDrag({
+              targetPos: [e.clientX - rect.left, e.clientY - rect.top],
+              targetNode: (elt && elt.dataset.nodeid) ?? null,
+            })
+          );
         }
       }}
       onPointerUp={e => {
@@ -79,7 +87,7 @@ export const GraphView: FC = () => {
               )
             );
           })}
-          <GestureView />;
+          <GestureFeedback />;
         </svg>
       </div>
     </div>

@@ -18,18 +18,18 @@ export interface IGesture {
   anchorPos: Point2D;
 
   /** Node currently being hovered. */
-  pointerNode: NodeID | null;
+  targetNode: NodeID | null;
 
   /** Current pointer position. */
-  pointerPos: Point2D;
+  targetPos: Point2D;
 }
 
 export const initialState: IGesture = {
   type: null,
   anchorNode: null,
   anchorPos: [0, 0],
-  pointerNode: null,
-  pointerPos: [0, 0],
+  targetNode: null,
+  targetPos: [0, 0],
 };
 
 /** Redux reducers for IGraph */
@@ -42,29 +42,31 @@ export const gestureSlice = createSlice({
       const { anchor, pos, type } = action.payload;
       state.type = type;
       state.anchorNode = anchor;
-      state.anchorPos = state.pointerPos = pos;
-      state.pointerNode = null;
+      state.anchorPos = state.targetPos = pos;
+      state.targetNode = null;
     },
 
     /** Update the coordinates of the drag. */
-    updateDrag(state, action: PayloadAction<{ pos: Point2D }>) {
-      state.pointerPos = action.payload.pos;
+    updateDrag(state, action: PayloadAction<{ targetPos: Point2D; targetNode: NodeID | null }>) {
+      state.targetPos = action.payload.targetPos;
+      state.targetNode = action.payload.targetNode;
     },
 
     /** Finish dragging. */
     endDrag(state) {
       state.type = null;
-      state.anchorNode = state.pointerNode = null;
+      state.anchorNode = state.targetNode = null;
     },
 
     /** Cancel the drag operation. */
     cancelDrag(state) {
       state.type = null;
-      state.anchorNode = state.pointerNode = null;
+      state.anchorNode = state.targetNode = null;
     },
   },
 });
 
+// TODO: Move this to a separate file!
 export const gestureListener = createListenerMiddleware();
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
@@ -75,10 +77,10 @@ startAppListening({
   actionCreator: gestureSlice.actions.endDrag,
   effect: async (action, listenerApi) => {
     const gesture = listenerApi.getState().gesture;
-    const [x, y] = gesture.pointerPos;
+    const [x, y] = gesture.targetPos;
     listenerApi.dispatch(
       addNode({
-        title: 'New',
+        title: 'New Node',
         position: [x - 25, y - 25],
         width: 50,
         height: 50,

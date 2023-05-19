@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { addNode, connect, graphSlice } from './Graph';
+import { IGraphNodeInput, addNodes, connect, graphSlice, layoutOrdered } from './Graph';
 import { gestureListener, gestureSlice } from './Gesture';
 
 export const rootStore = configureStore({
@@ -14,32 +14,27 @@ export const rootStore = configureStore({
 export type RootState = ReturnType<typeof rootStore.getState>;
 export type AppDispatch = typeof rootStore.dispatch;
 
-// Add an initial node for testing
-const node1 = rootStore.getState().graph.nextNodeId;
-rootStore.dispatch(
-  addNode({
-    title: 'Test Node',
-    position: [10, 10],
+const nodes: IGraphNodeInput[] = [];
+console.log('creating nodes');
+for (let i = 0; i < 1000; i++) {
+  // Add an initial node for testing
+  nodes.push({
+    title: `${i + 1}`,
+    position: [0, 0],
     width: 50,
     height: 50,
     data: null,
-  })
-);
+  });
+}
+console.log('adding nodes');
+rootStore.dispatch(addNodes(nodes));
+console.log('layout');
+rootStore.dispatch(layoutOrdered());
 
-const node2 = rootStore.getState().graph.nextNodeId;
-rootStore.dispatch(
-  addNode({
-    title: 'Test Node 2',
-    position: [100, 150],
-    width: 100,
-    height: 50,
-    data: null,
-  })
-);
-
+// Add an initial node for testing
 rootStore.dispatch(
   connect({
-    startNode: node1,
-    endNode: node2,
+    startNode: '1',
+    endNode: '2',
   })
 );
