@@ -1,6 +1,8 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { IGraphNodeInput, addNodes, connect, graphSlice, layoutOrdered } from './Graph';
-import { gestureListener, gestureSlice } from './Gesture';
+import { TypedStartListening, configureStore } from '@reduxjs/toolkit';
+import { IGraphNodeInput, addNodes, graphSlice, layoutOrdered, addEdges } from './graph';
+import { gestureSlice } from './gesture';
+import { gestureListener } from './gestureListener';
+import { graphListener } from './graphListener';
 
 export const rootStore = configureStore({
   reducer: {
@@ -8,11 +10,15 @@ export const rootStore = configureStore({
     gesture: gestureSlice.reducer,
   },
 
-  middleware: getDefaultMiddlware => getDefaultMiddlware().prepend(gestureListener.middleware),
+  middleware: getDefaultMiddlware =>
+    getDefaultMiddlware().prepend(gestureListener.middleware, graphListener.middleware),
 });
 
 export type RootState = ReturnType<typeof rootStore.getState>;
 export type AppDispatch = typeof rootStore.dispatch;
+export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
+
+// Create Test Data.
 
 const nodes: IGraphNodeInput[] = [];
 console.log('creating nodes');
@@ -21,20 +27,37 @@ for (let i = 0; i < 1000; i++) {
   nodes.push({
     title: `${i + 1}`,
     position: [0, 0],
-    width: 50,
-    height: 50,
+    size: [50, 50],
     data: null,
   });
 }
 console.log('adding nodes');
 rootStore.dispatch(addNodes(nodes));
-console.log('layout');
-rootStore.dispatch(layoutOrdered());
-
 // Add an initial node for testing
 rootStore.dispatch(
-  connect({
-    startNode: '1',
-    endNode: '2',
-  })
+  addEdges([
+    {
+      source: '1',
+      target: '2',
+    },
+    {
+      source: '3',
+      target: '4',
+    },
+    {
+      source: '5',
+      target: '6',
+    },
+    {
+      source: '7',
+      target: '8',
+    },
+    {
+      source: '9',
+      target: '10',
+    },
+  ])
 );
+console.log('layout');
+rootStore.dispatch(layoutOrdered());
+// rootStore.dispatch(routeEdges());

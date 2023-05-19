@@ -1,30 +1,20 @@
 import { FC, memo, useMemo } from 'react';
 import { graphContainerCss } from './GraphView.css';
-import { IGraphNode, Point2D } from '../../store';
+import { IEdge } from '../../store';
 
 interface Props {
-  startNode: IGraphNode;
-  endNode: IGraphNode;
+  edge: IEdge;
 }
 
 const CORNER_RADIUS = 32;
 
-export const GraphConnection: FC<Props> = memo(({ startNode, endNode }) => {
-  let [sx, sy] = startNode.position;
-  let [ex, ey] = endNode.position;
+export const GraphEdge: FC<Props> = memo(({ edge }) => {
+  const route = edge.route;
 
-  sx += startNode.width;
-  sy += startNode.height * 0.5;
-
-  ey += endNode.height * 0.5;
-
-  const path = useMemo(() => {
-    const route: Point2D[] = [
-      [sx, sy],
-      [(sx * 0.75 + ex * 0.25), sy],
-      [(sx * 0.25 + ex * 0.75), ey],
-      [ex, ey],
-    ];
+  const splinePath = useMemo(() => {
+    if (route.length === 0) {
+      return '';
+    }
 
     const fragments: string[] = [];
     for (let i = 0, ct = route.length - 2; i < ct; i++) {
@@ -32,7 +22,7 @@ export const GraphConnection: FC<Props> = memo(({ startNode, endNode }) => {
       const [x1, y1] = route[i + 1];
       const [x2, y2] = route[i + 2];
       if (i === 0) {
-        fragments.push(`${x0} ${y0}`);
+        fragments.push(`M${x0} ${y0}`);
       }
 
       // Control points for rounded corners.
@@ -58,16 +48,17 @@ export const GraphConnection: FC<Props> = memo(({ startNode, endNode }) => {
         fragments.push(`L${x2} ${y2}`);
       }
     }
-    return `M${fragments.join(' ')}`;
-  }, [sx, sy, ex, ey]);
+    return fragments.join(' ');
+  }, [route]);
 
-  return (
+  return splinePath ? (
     <path
       className={graphContainerCss}
       strokeWidth={2}
       stroke="green"
-      d={path}
+      d={splinePath}
       fill="transparent"
+      markerEnd="url(#small-arrow)"
     ></path>
-  );
+  ) : null;
 });

@@ -1,9 +1,9 @@
-import { PayloadAction, createListenerMiddleware, createSlice } from '@reduxjs/toolkit';
-import { NodeID, Point2D, addNode } from './Graph';
-import type { TypedStartListening } from '@reduxjs/toolkit';
-import type { AppDispatch, RootState } from './rootStore';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { NodeID } from './graph';
+import { AppPoint } from '../lib/geometry';
 
-type GestureType = 'move' | 'create';
+/** The kind of action which will be performed when the gesture is completed. */
+export type GestureType = 'move' | 'create';
 
 /** A 'gesture' is a drag action. */
 export interface IGesture {
@@ -15,13 +15,13 @@ export interface IGesture {
   anchorNode: NodeID | null;
 
   /** Initial pointer position. */
-  anchorPos: Point2D;
+  anchorPos: AppPoint;
 
   /** Node currently being hovered. */
   targetNode: NodeID | null;
 
   /** Current pointer position. */
-  targetPos: Point2D;
+  targetPos: AppPoint;
 }
 
 export const initialState: IGesture = {
@@ -38,7 +38,7 @@ export const gestureSlice = createSlice({
   initialState,
   reducers: {
     /** Begin dragging. */
-    beginDrag(state, action: PayloadAction<{ anchor: NodeID; pos: Point2D; type: GestureType }>) {
+    beginDrag(state, action: PayloadAction<{ anchor: NodeID; pos: AppPoint; type: GestureType }>) {
       const { anchor, pos, type } = action.payload;
       state.type = type;
       state.anchorNode = anchor;
@@ -47,7 +47,7 @@ export const gestureSlice = createSlice({
     },
 
     /** Update the coordinates of the drag. */
-    updateDrag(state, action: PayloadAction<{ targetPos: Point2D; targetNode: NodeID | null }>) {
+    updateDrag(state, action: PayloadAction<{ targetPos: AppPoint; targetNode: NodeID | null }>) {
       state.targetPos = action.payload.targetPos;
       state.targetNode = action.payload.targetNode;
     },
@@ -63,30 +63,6 @@ export const gestureSlice = createSlice({
       state.type = null;
       state.anchorNode = state.targetNode = null;
     },
-  },
-});
-
-// TODO: Move this to a separate file!
-export const gestureListener = createListenerMiddleware();
-
-export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
-
-export const startAppListening = gestureListener.startListening as AppStartListening;
-
-startAppListening({
-  actionCreator: gestureSlice.actions.endDrag,
-  effect: async (action, listenerApi) => {
-    const gesture = listenerApi.getState().gesture;
-    const [x, y] = gesture.targetPos;
-    listenerApi.dispatch(
-      addNode({
-        title: 'New Node',
-        position: [x - 25, y - 25],
-        width: 50,
-        height: 50,
-        data: null,
-      })
-    );
   },
 });
 

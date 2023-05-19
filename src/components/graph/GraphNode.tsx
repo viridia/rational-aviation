@@ -32,8 +32,8 @@ export const GraphNode: FC<Props> = memo(({ nodeId, onStartDrag }) => {
       className={clsx(graphNodeCss, { isAnchor, isTarget })}
       x={props.x}
       y={props.y}
-      width={node.width}
-      height={node.height}
+      width={node.size[0]}
+      height={node.size[1]}
       onPointerDown={e => {
         onStartDrag(e, nodeId);
       }}

@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { AppPoint, AppSize } from '../lib/geometry';
+import { invariant } from '../lib/invariant';
 
-export type Point2D = [number, number];
 export type NodeID = string;
 
 /** A node graph. */
@@ -8,8 +9,8 @@ export interface IGraph {
   /** Map of ids to nodes. */
   nodes: Record<NodeID, IGraphNode>;
 
-  /** List of connections. */
-  connections: IConnection[];
+  /** List of edges. */
+  edges: IEdge[];
 
   /** Next node id for adding nodes. */
   nextNodeId: number;
@@ -18,9 +19,8 @@ export interface IGraph {
 /** Defines an individual node in the graph. */
 export interface IGraphNode<Payload = unknown> {
   id: NodeID;
-  position: Point2D;
-  width: number;
-  height: number;
+  position: AppPoint;
+  size: AppSize;
   title: string;
   data: Payload;
 }
@@ -29,21 +29,24 @@ export interface IGraphNode<Payload = unknown> {
 export type IGraphNodeInput = Omit<IGraphNode, 'id'>;
 
 /** A connection between two nodes. */
-export interface IConnection {
-  startNode: NodeID;
-  endNode: NodeID;
-  route: Point2D[];
+export interface IEdge {
+  source: NodeID;
+  target: NodeID;
+  route: AppPoint[];
+  baseRoute: AppPoint[];
 }
+
+export type IEdgeInput = Omit<IEdge, 'route' | 'baseRoute'>;
 
 export const emptyGraph: IGraph = {
   nodes: {},
-  connections: [],
+  edges: [],
   nextNodeId: 1,
 };
 
 interface IGraphMoveNodeParams {
   nodeId: number;
-  position: Point2D;
+  position: AppPoint;
 }
 
 /** Redux reducers for IGraph */
@@ -78,28 +81,41 @@ export const graphSlice = createSlice({
       node.position = position;
     },
 
-    /** Create a connection between two nodes. */
-    connect(state, action: PayloadAction<{ startNode: NodeID; endNode: NodeID }>) {
-      const { startNode, endNode } = action.payload;
-      // TODO: Check for existing connection?
-      // TODO: Should we do routing here (sync) or asynchronously?
-      state.connections.push({
-        startNode,
-        endNode,
+    /** Create an edge between two nodes. */
+    addEdge(state, action: PayloadAction<IEdgeInput>) {
+      const { source, target } = action.payload;
+      // TODO: Check for existing edge?
+      state.edges.push({
+        source,
+        target,
         route: [],
+        baseRoute: [],
       });
     },
 
-    /** Delete a connection between two nodes. */
-    disconnect(state, action: PayloadAction<{ startNode: NodeID; endNode: NodeID }>) {
-      const { startNode, endNode } = action.payload;
-      // Could also do this with connections.filter - don't know which is better
-      const index = state.connections.findIndex(conn => {
-        (conn.startNode === startNode && conn.endNode === endNode) ||
-          (conn.startNode === endNode && conn.endNode === startNode);
+    /** Create an edge between two nodes. */
+    addEdges(state, action: PayloadAction<IEdgeInput[]>) {
+      // TODO: Check for existing edge?
+      state.edges.push(
+        ...action.payload.map(({ source, target }) => ({
+          source,
+          target,
+          route: [],
+          baseRoute: [],
+        }))
+      );
+    },
+
+    /** Delete an edge between two nodes. */
+    removeEdge(state, action: PayloadAction<IEdgeInput>) {
+      const { source, target } = action.payload;
+      // Could also do this with edges.filter - don't know which is better
+      const index = state.edges.findIndex(conn => {
+        (conn.source === source && conn.target === target) ||
+          (conn.source === target && conn.target === source);
       });
       if (index >= 0) {
-        state.connections.splice(index, 1);
+        state.edges.splice(index, 1);
       }
     },
 
@@ -122,11 +138,52 @@ export const graphSlice = createSlice({
         node.position = [x * 100 + 50, y * 100 + 50];
       }
     },
+
+    routeEdges(state) {
+      state.edges.forEach(edge => {
+        const source = state.nodes[edge.source];
+        const target = state.nodes[edge.target];
+        invariant(source);
+        invariant(target);
+        const [sx, sy] = source.position;
+        const [sw, sh] = source.size;
+        const [ex, ey] = target.position;
+        const [, eh] = target.size;
+
+        const smy = sy + sh * 0.5;
+        const emy = ey + eh * 0.5;
+
+        const sr = sx + sw;
+
+        // Super-cheesy layout algorithm.
+
+        const vertices: AppPoint[] = [[sr, smy]];
+        if (smy !== emy) {
+          vertices.push([sr + (ex - sr) * 0.25, smy], [sr + (ex - sr) * 0.75, emy]);
+        }
+        vertices.push([ex, emy]);
+
+        edge.baseRoute = edge.route;
+        edge.route = vertices;
+        if (edge.baseRoute.length === 0) {
+          edge.baseRoute = edge.route;
+        }
+      });
+    },
   },
 });
 
-export const { addNode, addNodes, moveNode, connect, disconnect, layoutOrdered, layoutRandom } =
-  graphSlice.actions;
+export const {
+  addNode,
+  addNodes,
+  moveNode,
+  addEdge,
+  addEdges,
+  removeEdge,
+  layoutOrdered,
+  layoutRandom,
+  routeEdges,
+} = graphSlice.actions;
 
 function shuffle(array: NodeID[]): NodeID[] {
   let currentIndex = array.length,

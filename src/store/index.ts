@@ -1,3 +1,3 @@
-export * from './Graph';
-export * from './Gesture';
+export * from './graph';
+export * from './gesture';
 export * from './rootStore';

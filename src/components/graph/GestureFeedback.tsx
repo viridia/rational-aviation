@@ -8,13 +8,25 @@ export const GestureFeedback: FC = memo(() => {
   const [px, py] = gesture.targetPos;
 
   const path = useMemo(() => {
+    if (!gesture.type) {
+      return '';
+    }
     const fragments: string[] = [];
-    fragments.push(`${ax} ${ay}`);
-    fragments.push(`${px} ${py}`);
-    return `M${fragments.join(' ')}`;
+    const l = Math.sqrt((px - ax) ** 2 + (py - ay) ** 2);
+    if (l <= 0.0001) {
+      return '';
+    }
+    const backOff = Math.min(l, 8);
+    const ix = px - (px - ax) * backOff / l;
+    const iy = py - (py - ay) * backOff / l;
+
+    fragments.push(`M${ax} ${ay}`);
+    fragments.push(`L${ix} ${iy}`);
+    fragments.push(`M${px} ${py}`);
+    return fragments.join(' ');
   }, [ax, ay, px, py]);
 
-  return gesture.type ? (
+  return gesture.type && path ? (
     <>
       <defs>
         {/* <marker
@@ -42,6 +54,8 @@ export const GestureFeedback: FC = memo(() => {
             stroke="yellow"
             strokeWidth={2}
             strokeLinejoin="miter"
+            strokeDasharray="100"
+            fill="transparent"
           />
         </marker>
       </defs>

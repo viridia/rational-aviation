@@ -2,10 +2,11 @@ import { FC, useRef } from 'react';
 import { graphContainerCss, graphContainerScrollCss, graphContentCss } from './GraphView.css';
 import { GraphNode } from './GraphNode';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { GraphConnection } from './GraphConnection';
+import { GraphEdge } from './GraphEdge';
 import { GestureFeedback } from './GestureFeedback';
 import { NodeID, beginDrag, cancelDrag, endDrag, updateDrag } from '../../store';
 import clsx from 'clsx';
+import { GraphEdgeMarkers } from './GraphEdgeMarkers';
 
 export const GraphView: FC = () => {
   const graph = useAppSelector(state => state.graph);
@@ -66,26 +67,12 @@ export const GraphView: FC = () => {
           width={20000}
           height={20000}
         >
+          <GraphEdgeMarkers />
           {Object.values(graph.nodes).map(node => (
             <GraphNode key={node.id} nodeId={node.id} onStartDrag={onStartDragNode} />
           ))}
-          {graph.connections.map(conn => {
-            // Note: I'm not familiar enough with Redux to be certain that this is efficient.
-            // I worry that adding or removing a connection will require re-rendering all connections.
-            // The previous section, with the nodes, doesn't have this problem since it only
-            // passes the node id.
-            const startNode = graph.nodes[conn.startNode];
-            const endNode = graph.nodes[conn.endNode];
-            return (
-              startNode &&
-              endNode && (
-                <GraphConnection
-                  key={`${conn.startNode}:${conn.endNode}`}
-                  startNode={startNode}
-                  endNode={endNode}
-                />
-              )
-            );
+          {graph.edges.map(edge => {
+            return <GraphEdge key={`${edge.source}:${edge.target}`} edge={edge} />;
           })}
           <GestureFeedback />;
         </svg>
