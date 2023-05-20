@@ -1,5 +1,5 @@
 import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
-import { graphSlice, routeEdges } from './graph';
+import { graphSlice, routeEdges } from './graphSlice';
 import type { AppStartListening } from './rootStore';
 
 export const graphListener = createListenerMiddleware();

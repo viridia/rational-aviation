@@ -1,6 +1,6 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
-import { addNode } from './graph';
-import { gestureSlice } from './gesture';
+import { addNode } from './graphSlice';
+import { gestureSlice } from './gestureSlice';
 import type { AppStartListening } from './rootStore';
 
 export const gestureListener = createListenerMiddleware();

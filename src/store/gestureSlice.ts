@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { NodeID } from './graph';
+import { NodeID } from './graphSlice';
 import { AppPoint } from '../lib/geometry';
 
 /** The kind of action which will be performed when the gesture is completed. */

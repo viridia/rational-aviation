@@ -1,6 +1,6 @@
 import { TypedStartListening, configureStore } from '@reduxjs/toolkit';
-import { IGraphNodeInput, addNodes, graphSlice, layoutOrdered, addEdges } from './graph';
-import { gestureSlice } from './gesture';
+import { IGraphNodeInput, addNodes, graphSlice, layoutOrdered, addEdges } from './graphSlice';
+import { gestureSlice } from './gestureSlice';
 import { gestureListener } from './gestureListener';
 import { graphListener } from './graphListener';
 
