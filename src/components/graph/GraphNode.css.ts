@@ -4,6 +4,7 @@ export const graphNodeCss = style({
   fill: 'black',
   strokeWidth: 2,
   stroke: 'red',
+  pointerEvents: 'all',
 
   selectors: {
     '&.isAnchor': {

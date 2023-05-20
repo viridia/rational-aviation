@@ -1,6 +1,6 @@
 import { FC, memo, useMemo } from 'react';
-import { graphContainerCss } from './GraphView.css';
 import { IEdge } from '../../store';
+import { graphEdgeCss } from './GraphEdge.css';
 
 interface Props {
   edge: IEdge;
@@ -53,7 +53,7 @@ export const GraphEdge: FC<Props> = memo(({ edge }) => {
 
   return splinePath ? (
     <path
-      className={graphContainerCss}
+      className={graphEdgeCss}
       strokeWidth={2}
       stroke="green"
       d={splinePath}
